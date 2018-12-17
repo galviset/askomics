@@ -17,7 +17,7 @@ class FederationQueryLauncherTests(unittest.TestCase):
         self.settings = get_appsettings('configs/tests.ini', name='main')
 
         self.request = testing.DummyRequest()
-        self.settings['askomics.fdendpoint'] = 'http://localhost:8890/sparql'
+        self.settings['askomics.federation_url'] = 'http://localhost:8080/sparql'
 
     def test_process_query(self):
         jm = EndpointManager(self.settings, self.request.session)

@@ -152,7 +152,7 @@ class SparqlQueryBuilder(ParamManager):
         return settings
 
 
-    def build_query_on_the_fly(self, replacement, adminrequest=False, externalrequest= False):
+    def build_query_on_the_fly(self, replacement, adminrequest=False, externalrequest= False, federation=False):
         """
         Build a query from the private or public template
         """
@@ -197,14 +197,14 @@ class SparqlQueryBuilder(ParamManager):
             query += replacement['post_action'] + "\n"
 
         #Corese sparql endpoint does not support prefixes
-        if self.settings['askomics.federation_engine'] != "corese":
+        if self.settings['askomics.federation_engine'] == "corese" and federation == True:
+            return query
+        else:
             prefixes = self.header_sparql_config(query)
             return prefixes + query
-        else:
-            return query
 
 
-    def custom_query(self, fromgraph, select, query,externalrequest=False,adminrequest=False):
+    def custom_query(self, fromgraph, select, query,externalrequest=False,adminrequest=False, federation=False):
         """
         launch a custom query.
         """
@@ -215,7 +215,7 @@ class SparqlQueryBuilder(ParamManager):
             'from' : fromgraph,
             'select': select,
             'query': query
-        },externalrequest=exr,adminrequest=ar)
+        },externalrequest=exr,adminrequest=ar, federation=federation)
 
     def get_delete_query_string(self, graph):
         """
