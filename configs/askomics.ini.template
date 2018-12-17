@@ -36,9 +36,11 @@ askomics.delete_method = DELETE
 askomics.triplestore_results_max_rows=10000
 
 
-# Fedex Configuration
-askomics.fdendpoint=http://localhost:4040/fedx
-
+# Federation Configuration
+askomics.federation_engine=corese
+askomics.federation_url=http://localhost:8080/sparql
+# fedx = http://localhost:4040/fedx
+# corese = http://localhost:8080/
 
 # AskOmics configuration
 # - files_dir: where AskOmics write user data

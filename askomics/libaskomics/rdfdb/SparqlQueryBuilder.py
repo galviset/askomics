@@ -196,8 +196,12 @@ class SparqlQueryBuilder(ParamManager):
         if 'post_action' in replacement:
             query += replacement['post_action'] + "\n"
 
-        prefixes = self.header_sparql_config(query)
-        return prefixes + query
+        #Corese sparql endpoint does not support prefixes
+        if self.settings['askomics.federation_engine'] != "corese":
+            prefixes = self.header_sparql_config(query)
+            return prefixes + query
+        else:
+            return query
 
 
     def custom_query(self, fromgraph, select, query,externalrequest=False,adminrequest=False):
