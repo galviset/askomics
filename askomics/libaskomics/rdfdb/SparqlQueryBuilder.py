@@ -198,6 +198,7 @@ class SparqlQueryBuilder(ParamManager):
 
         #Corese sparql endpoint does not support prefixes
         if self.settings['askomics.federation_engine'] == "corese" and federation == True:
+            ## TODO : replace "askomics:" prefix in query
             return query
         else:
             prefixes = self.header_sparql_config(query)
