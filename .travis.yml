@@ -11,21 +11,17 @@ install:
   - pip install coveralls
   - python setup.py install
 before_script:
-  - docker pull tenforce/virtuoso
+  - docker pull askomics/virtuoso
   - docker pull bgruening/galaxy-stable
   - docker pull askomics/fedx4askomics:rdf4j
   - docker pull xgaia/corese
   - sudo docker run --name corese -p 5050:8080 -d xgaia/corese
   - sudo docker run --name fedx -p 4040:4040 -d askomics/fedx4askomics:rdf4j
-  - sudo docker run -d --name virtuoso -p 127.0.0.1:8890:8890 -p 127.0.0.1:1111:1111  -e DBA_PASSWORD=dba -e SPARQL_UPDATE=true -e DEFAULT_GRAPH=http://localhost:8890/DAV --net="host" -t tenforce/virtuoso
-  - sudo docker run -d --name virtuoso2 -p 127.0.0.1:8891:8890 -p 127.0.0.1:1112:1111  -e DBA_PASSWORD=dba -e SPARQL_UPDATE=true -e DEFAULT_GRAPH=http://localhost:8891/DAV --net="host" -t tenforce/virtuoso
-  - sudo docker run -d --name galaxy -p 8080:80 -p 8021:21 -p 8022:22 bgruening/galaxy-stable
+  - sudo docker run -d --name virtuoso -p 8890:8890 -e DBA_PASSWORD=dba -e SPARQL_UPDATE=true -e DEFAULT_GRAPH=http://localhost:8890/DAV --net="host" -t askomics/virtuoso
+  - sudo docker run -d --name virtuoso2 -p 8891:8890 -e DBA_PASSWORD=dba -e SPARQL_UPDATE=true -e DEFAULT_GRAPH=http://localhost:8891/DAV --net="host" -t askomics/virtuoso
+  - sudo docker run -d --name galaxy -p 8080:80 bgruening/galaxy-stable
   - sleep 1m
-  - docker ps -a
-  - docker logs galaxy
 script:
   - python setup.py nosetests
-# - gulp test
-#  - coveralls-lcov -v -n coverage/frontend.lcov > coverage.json
 after_success:
   coveralls
