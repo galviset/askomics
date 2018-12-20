@@ -26,9 +26,6 @@ class FederationQueryLauncher(QueryLauncher):
 
 
         self.log.debug(" =================== Federation Request ====================")
-        self.log.debug('°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°')
-
-        self.log.debug(list_endpoints)
 
         # comments added in sparql request to get all url endpoint.
         if self.settings['askomics.federation_engine'] == "corese":
@@ -65,7 +62,6 @@ class FederationQueryLauncher(QueryLauncher):
         '''
         self.log.debug("================================================================================")
         self.log.debug(" =================== Federation Request : process_query  ====================")
-        self.log.debug(query)
         self.log.debug("================================================================================")
 
         # Federation Request case
