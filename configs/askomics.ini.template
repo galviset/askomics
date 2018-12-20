@@ -37,10 +37,11 @@ askomics.triplestore_results_max_rows=10000
 
 
 # Federation Configuration
-askomics.federation_engine=corese
-askomics.federation_url=http://localhost:8080/sparql
-# fedx = http://localhost:4040/fedx
-# corese = http://localhost:8080/
+# - federation_engine: fedx or corese
+# - federation_url: url of the federated query engine
+#askomics.federation_engine=
+#askomics.federation_url=
+
 
 # AskOmics configuration
 # - files_dir: where AskOmics write user data

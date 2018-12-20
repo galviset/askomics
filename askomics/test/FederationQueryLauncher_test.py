@@ -7,6 +7,8 @@ from pyramid.paster import get_appsettings
 from pyramid import testing
 from askomics.libaskomics.rdfdb.FederationQueryLauncher import FederationQueryLauncher
 from askomics.libaskomics.EndpointManager import EndpointManager
+from interface_tps_db import InterfaceTpsDb
+from SetupTests import SetupTests
 
 class FederationQueryLauncherTests(unittest.TestCase):
     """Test for the FederationQueryLauncher class"""
@@ -15,56 +17,83 @@ class FederationQueryLauncherTests(unittest.TestCase):
         """Set up the settings and session"""
 
         self.settings = get_appsettings('configs/tests.ini', name='main')
+        self.settings['askomics.upload_user_data_method'] = 'insert'
 
         self.request = testing.DummyRequest()
+        self.request.session['username'] = 'jdoe'
+        self.request.session['group'] = 'base'
+        self.request.session['admin'] = False
+        self.request.session['blocked'] = False
 
-
+        self.request.session['graph'] = "test/nosetest/jdoe"
+        SetupTests(self.settings, self.request.session)
+        self.tps = InterfaceTpsDb(self.settings, self.request)
 
 
     def test_process_query(self):
-        jm = EndpointManager(self.settings, self.request.session)
-        jm.remove_endpoint(1)
-        jm.save_endpoint("testNameEndpoint",'http://localhost:8890/sparql','Digest',True)
-        jm.save_endpoint("testNameEndpoint2", 'http://localhost:8891/sparql', 'Digest', True)
 
-        # Test FedX
+        # FedX
         self.settings['askomics.federation_engine'] = 'fedx'
         self.settings['askomics.federation_url'] = 'http://localhost:4040/fedx'
 
-        try:
-            fql = FederationQueryLauncher(self.settings, self.request.session,jm.list_endpoints())
-            fql.process_query("SELECT * WHERE { ?a ?b ?c. LIMIT 1}")
-            assert False
-        except ValueError:
-            assert True
+        self.tps.clean_up()
+        timestamp_people = self.tps.load_people()
+        bck = self.settings['askomics.endpoint']
+        self.settings['askomics.endpoint'] = 'http://localhost:8891/sparql'
+        self.tps.clean_up()
+        timestamp_people2 = self.tps.load_people2()
+        self.settings['askomics.endpoint'] = bck
 
-        lE = jm.list_endpoints()
-        for i in range(0, len(lE)):
-            lE[i]['askomics'] = True
+        self.tps.add_askoko_in_endpoint()
 
-        try:
-            fql = FederationQueryLauncher(self.settings, self.request.session,lE)
-            fql.process_query("SELECT * WHERE { ?a ?b ?c. } LIMIT 1")
-            assert True
-        except ValueError as e:
-            print(str(e))
-            assert False
+        list_endpoints = [{
+            'name': 'endpoint1',
+            'endpoint': 'http://localhost:8891/sparql',
+            'askomics': True,
+            'auth': 'Basic',
+            'username': None,
+            'password': None
+        }, {
+              'name': 'endpoint2',
+              'endpoint': 'http://localhost:8890/sparql',
+              'askomics': True,
+              'auth': 'Basic',
+              'username': None,
+              'password': None
+        }]
+
+        federation = FederationQueryLauncher(self.settings, self.request.session, list_endpoints)
 
 
-        # Test Corese
-        # self.settings['askomics.federation_engine'] = 'corese'
-        # self.settings['askomics.federation_url'] = 'http://localhost:5050/sparql'
-        # try:
-        #     fql = FederationQueryLauncher(self.settings, self.request.session,jm.list_endpoints())
-        #     fql.process_query("SELECT * WHERE { ?a ?b ?c. } LIMIT 1")
-        #     assert False
-        # except ValueError:
-        #     assert True
-        #
-        # try:
-        #     fql = FederationQueryLauncher(self.settings, self.request.session,lE)
-        #     fql.process_query("SELECT * WHERE { ?a ?b ?c. } LIMIT 1")
-        #     assert True
-        # except ValueError as e:
-        #     print(str(e))
-        #     assert False
+        # Corese
+        self.settings['askomics.federation_engine'] = 'corese'
+        self.settings['askomics.federation_url'] = 'http://localhost:5050'
+
+        self.tps.clean_up()
+        timestamp_people = self.tps.load_people()
+        bck = self.settings['askomics.endpoint']
+        self.settings['askomics.endpoint'] = 'http://localhost:8891/sparql'
+        self.tps.clean_up()
+        timestamp_people2 = self.tps.load_people2()
+        self.settings['askomics.endpoint'] = bck
+
+        self.tps.add_askoko_in_endpoint()
+
+        list_endpoints = [{
+            'name': 'endpoint1',
+            'endpoint': 'http://localhost:8891/sparql',
+            'askomics': True,
+            'auth': 'Basic',
+            'username': None,
+            'password': None
+        }, {
+              'name': 'endpoint2',
+              'endpoint': 'http://localhost:8890/sparql',
+              'askomics': True,
+              'auth': 'Basic',
+              'username': None,
+              'password': None
+        }]
+
+        federation = FederationQueryLauncher(self.settings, self.request.session, list_endpoints)
+

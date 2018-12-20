@@ -31,7 +31,6 @@ from askomics.libaskomics.rdfdb.SparqlQueryAuth import SparqlQueryAuth
 
 from askomics.libaskomics.rdfdb.QueryLauncher import QueryLauncher
 from askomics.libaskomics.rdfdb.MultipleQueryLauncher import MultipleQueryLauncher
-from askomics.libaskomics.rdfdb.FederationQueryLauncher import FederationQueryLauncher
 
 from askomics.libaskomics.source_file.SourceFile import SourceFile
 from askomics.libaskomics.source_file.SourceFileURL import SourceFileURL

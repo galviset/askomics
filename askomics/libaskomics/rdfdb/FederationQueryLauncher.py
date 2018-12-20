@@ -20,30 +20,33 @@ class FederationQueryLauncher(QueryLauncher):
           from these preformated results using a ResultsBuilder instance.
     """
 
-    def __init__(self, settings, session,lendpoints):
+    def __init__(self, settings, session, list_endpoints):
         QueryLauncher.__init__(self, settings, session)
         self.log = logging.getLogger(__name__)
 
 
         self.log.debug(" =================== Federation Request ====================")
+        self.log.debug('°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°')
 
-        #comments added in sparql request to get all url endpoint.
+        self.log.debug(list_endpoints)
+
+        # comments added in sparql request to get all url endpoint.
         if self.settings['askomics.federation_engine'] == "corese":
-            self.commentsForFed = "@trap@federate\n"  # @trap ignore results parsing errors and write it in Corese logs
-            for endp in lendpoints:
-                self.commentsForFed += "<" + endp['endpoint'] + ">\n"
+            self.federation_header = "@trap@federate\n"  # @trap ignore results parsing errors and write it in Corese logs
+            for endpoint in list_endpoints:
+                self.federation_header += "<" + endpoint['endpoint'] + ">\n"
 
         if self.settings['askomics.federation_engine'] == "fedx":
-            self.commentsForFed=""
-            for endp in lendpoints:
-                if 'askomics' not in endp:
-                   raise ValueError("endpoint var have to defined an 'askomics' key with a boolean value endp="+str(endp))
-                if endp['askomics']:
-                   self.commentsForFed+="#endpoint,askomics,"+endp['name']+','+endp['endpoint']+',false\n'
+            self.federation_header = ""
+            for endpoint in list_endpoints:
+                if 'askomics' not in endpoint:
+                   raise ValueError("endpoint var have to defined an 'askomics' key with a boolean value endpoint = " + str(endpoint))
+                if endpoint['askomics']:
+                   self.federation_header += "#endpoint,askomics," + endpoint['name'] + ',' + endpoint['endpoint'] + ',false\n'
                 else:
-                   self.commentsForFed+="#endpoint,external,"+endp['name']+','+endp['endpoint']+',false\n'
+                   self.federation_header += "#endpoint,external," + endpoint['name'] + ',' + endpoint['endpoint'] + ',false\n' 
             #add local TPS
-            #self.commentsForFed+="#endpoint,local,"+self.get_param("askomics.endpoint")+',false\n'
+            #self.federation_header += "#endpoint,local," + self.get_param("askomics.endpoint") + ',false\n'
 
         if not self.is_defined("askomics.federation_url") :
             raise ValueError("can not find askomics.federation_url property in the config file !")
@@ -62,10 +65,11 @@ class FederationQueryLauncher(QueryLauncher):
         '''
         self.log.debug("================================================================================")
         self.log.debug(" =================== Federation Request : process_query  ====================")
+        self.log.debug(query)
         self.log.debug("================================================================================")
 
         # Federation Request case
         #------------------------------------------------------
-        query = self.commentsForFed + query
-        json_query = self._execute_query(query,log_raw_results=False)
+        query = self.federation_header + query
+        json_query = self._execute_query(query, log_raw_results=False)
         return self.parse_results(json_query)

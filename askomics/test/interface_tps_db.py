@@ -103,7 +103,7 @@ class InterfaceTpsDb(object):
 
         src_file.set_forced_column_types(col_types)
         src_file.set_disabled_columns(disabled_columns)
-        src_file.set_param("askomics.upload_user_data_method",'insert')
+        src_file.set_param('askomics.upload_user_data_method', 'insert')
         src_file.persist('', public)
 
         return src_file.get_timestamp()
@@ -118,6 +118,17 @@ class InterfaceTpsDb(object):
         col_types = ['entity_start', 'text', 'text', 'category', 'numeric']
         uri_set = {'0': 'http://www.semanticweb.org/user/ontologies/2018/1#', '1': None, '2': None, '3': None, '4': None}
         return self.load_file("people.tsv", col_types, uri_set)
+
+    def load_people2(self):
+        """Load the file people2.tsv
+
+        :returns: the timestamp associated
+        :rtype: string
+        """
+
+        col_types = ['entity_start', 'text', 'text', 'category', 'numeric']
+        uri_set = {'0': 'http://www.semanticweb.org/user/ontologies/2018/1#', '1': None, '2': None, '3': None, '4': None}
+        return self.load_file("people2.tsv", col_types, uri_set, True)
 
     def load_instruments(self):
         """Load the file instruments.tsv
@@ -331,6 +342,22 @@ class InterfaceTpsDb(object):
             "otheradmin_apikey",
             "true",
             "false"
+        )
+        '''
+
+        database.execute_sql_query(query)
+
+    def add_askoko_in_endpoint(self):
+
+        database = DatabaseConnector(self.settings, self.request.session)
+        query = '''
+        INSERT INTO endpoints VALUES (
+            NULL,
+            "askoko",
+            "http://localhost:8891/sparql",
+            "BASIC",
+            "1",
+            NULL
         )
         '''
 
